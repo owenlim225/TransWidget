@@ -239,7 +239,7 @@ export function ReceivePanel({
       {/* Address Section */}
       <motion.div
         className={cn(
-          'p-4 rounded-lg border transition-colors duration-300',
+          'p-4 rounded-lg border transition-colors duration-300 overflow-hidden',
           borderClass,
           breakdownBgClass
         )}
@@ -248,13 +248,13 @@ export function ReceivePanel({
         <p className={cn('text-sm mb-2 transition-colors duration-300', labelClass)}>
           Address
         </p>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 w-full overflow-hidden">
           {currentAddress ? (
             <>
               {/* Mobile: shortened address, Desktop: full address */}
-              <p className="text-sm font-bold flex-1 transition-colors duration-300 font-mono">
+              <p className="text-sm font-bold flex-1 min-w-0 transition-colors duration-300 font-mono truncate sm:whitespace-normal sm:break-all">
                 <span className="sm:hidden">{shortenAddress(currentAddress)}</span>
-                <span className="hidden sm:inline break-all">{currentAddress}</span>
+                <span className="hidden sm:inline">{currentAddress}</span>
               </p>
               <button
                 onClick={handleCopy}

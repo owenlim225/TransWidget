@@ -179,7 +179,7 @@ export function FxWidget({
 
   return (
     <motion.div
-      className={`w-full max-w-md mx-auto p-6 rounded-lg border ${borderClass} ${bgClass} transition-colors duration-500 ease-in-out`}
+      className={`w-full max-w-md mx-auto p-6 rounded-lg border overflow-hidden ${borderClass} ${bgClass} transition-colors duration-500 ease-in-out`}
       role="region"
       aria-label="FX and fee transparency widget"
       variants={CONTAINER_VARIANTS}

@@ -43,7 +43,7 @@ export function WithdrawalAddressInput({
         Withdrawal Address
       </label>
       <motion.div
-        className="relative flex gap-2"
+        className="relative flex gap-2 w-full overflow-hidden"
         animate={{
           boxShadow: isFocused ? '0 0 0 3px rgba(255, 200, 40, 0.1)' : 'none',
         }}
@@ -57,13 +57,18 @@ export function WithdrawalAddressInput({
           onFocus={onFocus}
           onBlur={onBlur}
           placeholder="Enter withdrawal address"
-          className={cn('flex-1 px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-0 transition-colors duration-300', inputBgClass)}
+          className={cn(
+            'flex-1 min-w-0 px-4 py-3 border rounded-lg',
+            'focus:outline-none focus:ring-2 focus:ring-offset-0',
+            'transition-colors duration-300 text-ellipsis',
+            inputBgClass
+          )}
           style={{ '--tw-ring-color': '#FFC828' } as React.CSSProperties}
           aria-label="Withdrawal address"
         />
         <motion.button
           onClick={handlePasteFromClipboard}
-          className="p-3 rounded-lg border transition-all duration-300 border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 hover:bg-[#FFC828] hover:border-[#FFC828]"
+          className="shrink-0 p-3 rounded-lg border transition-all duration-300 border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 hover:bg-[#FFC828] hover:border-[#FFC828]"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           aria-label="Paste from clipboard"
