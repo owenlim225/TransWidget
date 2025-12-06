@@ -4,26 +4,42 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Wallet, LogOut, ChevronDown, Copy, ExternalLink, Check } from 'lucide-react'
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
-import { useWallet } from '../hooks/useWallet'
+import type { WalletInfo } from '../hooks/useWallet'
 import { ITEM_VARIANTS } from '../constants'
 
 interface WalletConnectProps {
   labelClass: string
   mutedClass: string
   onAddressChange?: (address: string) => void
+  // Controlled wallet state from parent
+  wallet: WalletInfo | null
+  isConnecting: boolean
+  isConnected: boolean
+  error: string | null
+  onConnect: () => Promise<void>
+  onDisconnect: () => void
 }
 
-export function WalletConnect({ labelClass, mutedClass, onAddressChange }: WalletConnectProps) {
-  const { wallet, isConnecting, isConnected, error, connect, disconnect } = useWallet()
+export function WalletConnect({ 
+  labelClass, 
+  mutedClass, 
+  onAddressChange,
+  wallet,
+  isConnecting,
+  isConnected,
+  error,
+  onConnect,
+  onDisconnect,
+}: WalletConnectProps) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [copied, setCopied] = useState(false)
 
   const handleConnect = async () => {
-    await connect()
+    await onConnect()
   }
 
   const handleDisconnect = () => {
-    disconnect()
+    onDisconnect()
     setIsDropdownOpen(false)
   }
 

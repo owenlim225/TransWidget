@@ -1,4 +1,5 @@
 {
-  "name": "trans-widget"
+  "name": "trans-widget",
+  "installCommand": "pnpm install --no-frozen-lockfile"
 }
 

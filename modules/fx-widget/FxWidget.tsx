@@ -5,7 +5,7 @@ import { motion } from 'framer-motion'
 
 // Module imports
 import { FX_CONFIG, CONTAINER_VARIANTS, ITEM_VARIANTS, PERCENTAGE_POINTS } from './constants'
-import { useDebounce, useFxCalculation, useThemeClasses } from './hooks'
+import { useDebounce, useFxCalculation, useThemeClasses, useWallet } from './hooks'
 import { findClosestPoint } from './utils/calculations'
 import { CURRENCY_SYMBOLS } from './types'
 import type { FxWidgetProps, ParsedQRData } from './types'
@@ -38,6 +38,9 @@ export function FxWidget({
 }: FxWidgetProps) {
   // Theme - now returns Tailwind dark: classes
   const { bgClass, borderClass, inputBgClass, labelClass, mutedClass, breakdownBgClass } = useThemeClasses()
+
+  // Wallet connection (shared between Send and Receive panels)
+  const { wallet, isConnecting, isConnected, error: walletError, connect, disconnect } = useWallet()
 
   // State
   const [accountBalance, setAccountBalance] = useState(FX_CONFIG.accountBalance)
@@ -201,6 +204,12 @@ export function FxWidget({
             labelClass={labelClass}
             mutedClass={mutedClass}
             onAddressChange={setWithdrawalAddress}
+            wallet={wallet}
+            isConnecting={isConnecting}
+            isConnected={isConnected}
+            error={walletError}
+            onConnect={connect}
+            onDisconnect={disconnect}
           />
 
           <WithdrawalAddressInput
@@ -328,6 +337,7 @@ export function FxWidget({
           breakdownBgClass={breakdownBgClass}
           labelClass={labelClass}
           mutedClass={mutedClass}
+          wallet={wallet}
         />
       )}
     </motion.div>

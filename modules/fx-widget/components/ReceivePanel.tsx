@@ -2,10 +2,11 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Copy, Check, ChevronDown } from 'lucide-react'
+import { Copy, Check, ChevronDown, Wallet } from 'lucide-react'
 import { QrCode } from '@ark-ui/react/qr-code'
 import { cn } from '@/lib/utils'
 import { ITEM_VARIANTS } from '../constants'
+import type { WalletInfo } from '../hooks/useWallet'
 import {
   MorphingPopover,
   MorphingPopoverTrigger,
@@ -13,21 +14,13 @@ import {
 } from '@/components/ui/morphing-popover'
 
 // ============================================================================
-// Demo Data
+// Constants
 // ============================================================================
-const DEMO_ADDRESS = '0x1a2b3c4d5e6f7890abcdef1234567890abcdef12'
-
 const NETWORKS = [
   { id: 'tron', name: 'TRC20 (Tron)', symbol: 'TRX', icon: '⚡' },
   { id: 'ethereum', name: 'ERC20 (Ethereum)', symbol: 'ETH', icon: '💎' },
   { id: 'bsc', name: 'BEP20 (BSC)', symbol: 'BNB', icon: '🔶' },
   { id: 'polygon', name: 'Polygon', symbol: 'MATIC', icon: '🟣' },
-]
-
-const ACCOUNTS = [
-  { id: '1', name: 'Account 1', icon: '👤' },
-  { id: '2', name: 'Account 2', icon: '👤' },
-  { id: '3', name: 'Account 3', icon: '👤' },
 ]
 
 // ============================================================================
@@ -182,6 +175,8 @@ interface ReceivePanelProps {
   breakdownBgClass: string
   labelClass: string
   mutedClass: string
+  // Connected wallet from Send panel
+  wallet: WalletInfo | null
 }
 
 export function ReceivePanel({
@@ -189,15 +184,24 @@ export function ReceivePanel({
   breakdownBgClass,
   labelClass,
   mutedClass,
+  wallet,
 }: ReceivePanelProps) {
   const [copied, setCopied] = useState(false)
   const [selectedNetwork, setSelectedNetwork] = useState(NETWORKS[0])
-  const [selectedAccount, setSelectedAccount] = useState(ACCOUNTS[0])
   const [networkOpen, setNetworkOpen] = useState(false)
-  const [accountOpen, setAccountOpen] = useState(false)
+
+  // Helper to shorten address for display
+  const shortenAddress = (address: string) => {
+    if (!address) return ''
+    return `${address.slice(0, 6)}...${address.slice(-4)}`
+  }
+
+  // Get the current address from connected wallet
+  const currentAddress = wallet?.connected ? wallet.address : ''
 
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(DEMO_ADDRESS)
+    if (!currentAddress) return
+    await navigator.clipboard.writeText(currentAddress)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
@@ -218,7 +222,18 @@ export function ReceivePanel({
 
       {/* QR Code */}
       <div className="flex justify-center">
-        <QrCodeDisplay value={DEMO_ADDRESS} size="md" />
+        {currentAddress ? (
+          <QrCodeDisplay value={currentAddress} size="md" />
+        ) : (
+          <div className="w-48 h-48 bg-gray-100 dark:bg-gray-800 rounded-xl flex items-center justify-center border border-gray-200 dark:border-gray-700">
+            <div className="text-center p-4">
+              <Wallet className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Connect wallet on Send tab to generate QR
+              </p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Address Section */}
@@ -234,24 +249,32 @@ export function ReceivePanel({
           Address
         </p>
         <div className="flex items-center gap-2">
-          <p className="text-sm font-bold break-all flex-1 transition-colors duration-300">
-            {DEMO_ADDRESS}
-          </p>
-          <button
-            onClick={handleCopy}
-            className={cn(
-              'p-2 rounded-lg border transition-all duration-300',
-              'hover:bg-[#FFC828] hover:border-[#FFC828] hover:scale-105 active:scale-95',
-              'border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700'
-            )}
-            aria-label="Copy address"
-          >
-            {copied ? (
-              <Check className="w-4 h-4 text-green-500" />
-            ) : (
-              <Copy className="w-4 h-4" />
-            )}
-          </button>
+          {currentAddress ? (
+            <>
+              <p className="text-sm font-bold break-all flex-1 transition-colors duration-300">
+                {currentAddress}
+              </p>
+              <button
+                onClick={handleCopy}
+                className={cn(
+                  'p-2 rounded-lg border transition-all duration-300',
+                  'hover:bg-[#FFC828] hover:border-[#FFC828] hover:scale-105 active:scale-95',
+                  'border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700'
+                )}
+                aria-label="Copy address"
+              >
+                {copied ? (
+                  <Check className="w-4 h-4 text-green-500" />
+                ) : (
+                  <Copy className="w-4 h-4" />
+                )}
+              </button>
+            </>
+          ) : (
+            <p className="text-sm text-gray-500 dark:text-gray-400 flex-1">
+              No wallet connected. Connect on Send tab first.
+            </p>
+          )}
         </div>
       </motion.div>
 
@@ -278,14 +301,18 @@ export function ReceivePanel({
 
         {/* Account Row */}
         <InfoRow label="Account" labelClass={labelClass}>
-          <Dropdown
-            title="Select Account"
-            options={ACCOUNTS}
-            selected={selectedAccount}
-            onSelect={(option) => setSelectedAccount(option as typeof ACCOUNTS[0])}
-            open={accountOpen}
-            onOpenChange={setAccountOpen}
-          />
+          {wallet?.connected ? (
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-green-500 bg-green-50 dark:bg-green-900/20 text-sm font-medium">
+              <span className="text-green-600 dark:text-green-400">🔗</span>
+              <span className="text-green-700 dark:text-green-300">
+                {shortenAddress(wallet.address)}
+              </span>
+            </div>
+          ) : (
+            <span className="text-sm text-gray-500 dark:text-gray-400 px-3 py-1.5">
+              Not connected
+            </span>
+          )}
         </InfoRow>
 
         {/* Minimum Deposit Row */}
