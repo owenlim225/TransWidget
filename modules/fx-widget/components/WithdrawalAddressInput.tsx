@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Copy } from 'lucide-react'
+import { ClipboardPaste } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ITEM_VARIANTS } from '../constants'
 
@@ -24,17 +24,15 @@ export function WithdrawalAddressInput({
   labelClass,
   inputBgClass,
 }: WithdrawalAddressInputProps) {
-  const handleClipboard = async () => {
-    if (value) {
-      try {
-        await navigator.clipboard.writeText(value)
-        alert('Address copied to clipboard!')
-      } catch (err) {
-        console.error('Failed to copy to clipboard:', err)
-        alert('Failed to copy address to clipboard')
+  const handlePasteFromClipboard = async () => {
+    try {
+      const text = await navigator.clipboard.readText()
+      if (text) {
+        onChange(text.trim())
       }
-    } else {
-      alert('Please enter an address first')
+    } catch (err) {
+      console.error('Failed to paste from clipboard:', err)
+      alert('Failed to paste from clipboard. Please check browser permissions.')
     }
   }
 
@@ -64,14 +62,14 @@ export function WithdrawalAddressInput({
           aria-label="Withdrawal address"
         />
         <motion.button
-          onClick={handleClipboard}
+          onClick={handlePasteFromClipboard}
           className="p-3 rounded-lg border transition-all duration-300 border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 hover:bg-[#FFC828] hover:border-[#FFC828]"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          aria-label="Copy address to clipboard"
-          title="Copy address to clipboard"
+          aria-label="Paste from clipboard"
+          title="Paste from clipboard"
         >
-          <Copy className="w-5 h-5" />
+          <ClipboardPaste className="w-5 h-5" />
         </motion.button>
       </motion.div>
     </motion.div>

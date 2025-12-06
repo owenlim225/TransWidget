@@ -14,6 +14,7 @@ import type { FxWidgetProps, ParsedQRData } from './types'
 import {
   WidgetHeader,
   DirectionToggle,
+  WalletConnect,
   WithdrawalAddressInput,
   AssetNetworkSelector,
   AmountInput,
@@ -145,6 +146,25 @@ export function FxWidget({
     // Auto-fill currency if supported and present in QR
     if (data.transactionCurrency && supportedCurrencies.includes(data.transactionCurrency)) {
       setCurrency(data.transactionCurrency)
+      
+      // Auto-fill amount if transaction amount is present
+      if (data.transactionAmount && data.transactionAmount > 0) {
+        const rate = FX_CONFIG.customerRates[data.transactionCurrency]
+        if (rate) {
+          // Calculate stablecoin amount needed to cover the requested fiat amount
+          // Add ~3% buffer to account for fees (ripe fee + network fee + spread)
+          const baseStablecoin = data.transactionAmount / rate
+          const withBuffer = baseStablecoin * 1.03 // 3% buffer for fees
+          const roundedAmount = Math.ceil(withBuffer * 100) / 100 // Round up to 2 decimals
+          
+          // Cap at account balance
+          const finalAmount = Math.min(roundedAmount, accountBalance)
+          
+          setAmount(finalAmount)
+          setAmountInput(finalAmount.toFixed(2))
+          setSliderValue((finalAmount / accountBalance) * 100)
+        }
+      }
     }
   }
 
@@ -177,6 +197,12 @@ export function FxWidget({
           animate="visible"
           variants={CONTAINER_VARIANTS}
         >
+          <WalletConnect
+            labelClass={labelClass}
+            mutedClass={mutedClass}
+            onAddressChange={setWithdrawalAddress}
+          />
+
           <WithdrawalAddressInput
             value={withdrawalAddress}
             onChange={setWithdrawalAddress}

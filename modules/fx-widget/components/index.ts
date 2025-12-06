@@ -1,5 +1,6 @@
 export { WidgetHeader } from './WidgetHeader'
 export { DirectionToggle } from './DirectionToggle'
+export { WalletConnect } from './WalletConnect'
 export { WithdrawalAddressInput } from './WithdrawalAddressInput'
 export { QRScanner } from './QRScanner'
 export { MerchantInfo } from './MerchantInfo'
