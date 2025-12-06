@@ -251,13 +251,15 @@ export function ReceivePanel({
         <div className="flex items-center gap-2">
           {currentAddress ? (
             <>
-              <p className="text-sm font-bold break-all flex-1 transition-colors duration-300">
-                {currentAddress}
+              {/* Mobile: shortened address, Desktop: full address */}
+              <p className="text-sm font-bold flex-1 transition-colors duration-300 font-mono">
+                <span className="sm:hidden">{shortenAddress(currentAddress)}</span>
+                <span className="hidden sm:inline break-all">{currentAddress}</span>
               </p>
               <button
                 onClick={handleCopy}
                 className={cn(
-                  'p-2 rounded-lg border transition-all duration-300',
+                  'p-2 rounded-lg border transition-all duration-300 shrink-0',
                   'hover:bg-[#FFC828] hover:border-[#FFC828] hover:scale-105 active:scale-95',
                   'border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700'
                 )}
